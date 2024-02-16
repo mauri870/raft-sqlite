@@ -6,6 +6,10 @@ This is a sqlite backend for [hashicorp/raft](https://github.com/hashicorp/raft)
 
 ## Usage
 
+```bash
+go get -u github.com/mauri870/raft-sqlite
+```
+
 ```go
 //...
 sqliteStore, err := raftsqlite.NewStore(filepath.Join(raftDir, "raft.db"))
