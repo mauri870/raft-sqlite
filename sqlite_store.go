@@ -105,10 +105,7 @@ func (s *SqliteStore) Close() error {
 // FirstIndex returns the first known index from the Raft log.
 func (s *SqliteStore) FirstIndex() (uint64, error) {
 	var idx uint64
-	err := s.transaction(func(tx *sql.Tx) error {
-		row := tx.QueryRow("SELECT idx FROM logs ORDER BY idx ASC LIMIT 1")
-		return row.Scan(&idx)
-	})
+	err := s.db.QueryRow("SELECT idx FROM logs ORDER BY idx ASC LIMIT 1").Scan(&idx)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return 0, nil
@@ -121,10 +118,7 @@ func (s *SqliteStore) FirstIndex() (uint64, error) {
 // LastIndex returns the last known index from the Raft log.
 func (s *SqliteStore) LastIndex() (uint64, error) {
 	var idx uint64
-	err := s.transaction(func(tx *sql.Tx) error {
-		row := tx.QueryRow("SELECT idx FROM logs ORDER BY idx DESC LIMIT 1")
-		return row.Scan(&idx)
-	})
+	err := s.db.QueryRow("SELECT idx FROM logs ORDER BY idx DESC LIMIT 1").Scan(&idx)
 	if err != nil {
 		return 0, err
 	}
@@ -134,10 +128,7 @@ func (s *SqliteStore) LastIndex() (uint64, error) {
 // GetLog is used to retrieve a log at a given index.
 func (s *SqliteStore) GetLog(idx uint64, log *raft.Log) error {
 	var data []byte
-	err := s.transaction(func(tx *sql.Tx) error {
-		row := tx.QueryRow("SELECT data FROM logs WHERE idx = ?", idx)
-		return row.Scan(&data)
-	})
+	err := s.db.QueryRow("SELECT data FROM logs WHERE idx = ?", idx).Scan(&data)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return raft.ErrLogNotFound
@@ -188,10 +179,7 @@ func (s *SqliteStore) Set(k, v []byte) error {
 // Get is used to retrieve a value from the k/v store by key
 func (s *SqliteStore) Get(k []byte) ([]byte, error) {
 	var value []byte
-	err := s.transaction(func(tx *sql.Tx) error {
-		row := tx.QueryRow("SELECT value FROM kv WHERE key = ?", k)
-		return row.Scan(&value)
-	})
+	err := s.db.QueryRow("SELECT value FROM kv WHERE key = ?", k).Scan(&value)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrKeyNotFound
