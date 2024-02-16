@@ -44,8 +44,8 @@ func NewStore(path string) (*SqliteStore, error) {
 	// database initialization
 	err = store.transaction(func(tx *sql.Tx) error {
 		// Synchronous=full is the default, but normal when paired with
-		// WAL mode complete database integrity is guaranteed. Normal
-		// also issues less fsyncs.
+		// WAL mode guarantees complete database integrity. Normal also
+		// issues less fsyncs.
 		_, err := db.Exec("PRAGMA synchronous=normal")
 		if err != nil {
 			return err
