@@ -32,7 +32,7 @@ func createRaftLog(idx uint64, data string) *raft.Log {
 func assert(t testing.TB, b bool, msg string) {
 	t.Helper()
 	if !b {
-		t.Fatalf(msg)
+		t.Fatal(msg)
 	}
 }
 

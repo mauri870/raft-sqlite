@@ -120,6 +120,9 @@ func (s *SqliteStore) LastIndex() (uint64, error) {
 	var idx uint64
 	err := s.db.QueryRow("SELECT idx FROM logs ORDER BY idx DESC LIMIT 1").Scan(&idx)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return 0, nil
+		}
 		return 0, err
 	}
 	return idx, nil
@@ -155,6 +158,9 @@ func (s *SqliteStore) StoreLogs(logs []*raft.Log) error {
 			}
 
 			_, err = tx.Exec("INSERT INTO logs (idx, data) VALUES (?, ?)", key, val.Bytes())
+			if err != nil {
+				return err
+			}
 		}
 		return nil
 	})
